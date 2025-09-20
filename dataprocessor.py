@@ -545,7 +545,6 @@ class CHADataCollator:
             'position_ids': position_ids,
             'question_ids': question_ids,
             'label_ids': label_ids,
-            'is_beacon': is_beacon,
         })
 
 # class CompressionStrategy:

@@ -61,14 +61,12 @@ class CHATrainer(Trainer):
         attention_mask = inputs['attention_mask']
         position_ids = inputs['position_ids']
         label_ids = inputs['label_ids']
-        is_beacon = inputs['is_beacon'].to(torch.bool)
         
         label_ids = label_ids[0]
         logits = model(
             input_ids=input_ids, 
             attention_mask=attention_mask, 
             position_ids=position_ids,
-            is_beacon = is_beacon
         ).logits[0][-len(label_ids)-1:-1]
 
         next_token_logits = logits
@@ -139,17 +137,17 @@ class CHATrainer(Trainer):
 
         return batch_samples, num_items_in_batch
 
-    def floating_point_ops(self, inputs: Dict[str, Union[torch.Tensor, Any]]):
-        """
-        For models that inherit from [`PreTrainedModel`], uses that method to compute the number of floating point
-        operations for every backward + forward pass. If using another model, either implement such a method in the
-        model or subclass and override this method.
+    # def floating_point_ops(self, inputs: Dict[str, Union[torch.Tensor, Any]]):
+    #     """
+    #     For models that inherit from [`PreTrainedModel`], uses that method to compute the number of floating point
+    #     operations for every backward + forward pass. If using another model, either implement such a method in the
+    #     model or subclass and override this method.
 
-        Args:
-            inputs (`Dict[str, Union[torch.Tensor, Any]]`):
-                The inputs and targets of the model.
+    #     Args:
+    #         inputs (`Dict[str, Union[torch.Tensor, Any]]`):
+    #             The inputs and targets of the model.
 
-        Returns:
-            `int`: The number of floating-point operations.
-        """
-        return 0
+    #     Returns:
+    #         `int`: The number of floating-point operations.
+    #     """
+    #     return 0
