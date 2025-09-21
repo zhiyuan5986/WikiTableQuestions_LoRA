@@ -109,9 +109,6 @@ if __name__ == "__main__":
     set_seed(training_args.seed)
 
     # tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
-    model, tokenizer = load_model_and_tokenizer(
-        model_args = model_args, 
-    )
     lora_config = LoraConfig(
         r=custom_args.lora_r,
         lora_alpha=2 * custom_args.lora_r,
@@ -120,7 +117,10 @@ if __name__ == "__main__":
         task_type=None,
         target_modules=['q_proj', 'v_proj', 'k_proj']
     )
-    model = get_peft_model(model, lora_config)
+    model, tokenizer = load_model_and_tokenizer(
+        model_args = model_args, 
+        lora_config=lora_config
+    )
     preprocessor = SamplePreprocessorForPretrain(tokenizer=tokenizer, beacon_size=custom_args.beacon_size, max_length=data_args.max_length)
     data_collator = CHADataCollator()
     if data_args.dataset_path is None:

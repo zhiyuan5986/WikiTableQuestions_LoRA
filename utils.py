@@ -32,6 +32,7 @@ class StopTrainingCallback(TrainerCallback):
 def load_model_and_tokenizer(
         model_args, 
         param_dir = None,
+        lora_config = None,
         lm_model_device_map = None,
         **kwargs
     ):
@@ -43,7 +44,7 @@ def load_model_and_tokenizer(
     try:
         model = PeftModel.from_pretrained(model, param_dir, torch_dtype=model_args.torch_dtype, is_trainable=True)
     except:
-        pass
+        model = get_peft_model(model, lora_config)
     # for name, param in model.named_parameters():
     #     if not "beacon" in name:
     #         param.requires_grad = False

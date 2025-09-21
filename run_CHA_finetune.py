@@ -120,9 +120,8 @@ if __name__ == "__main__":
     )
     model, tokenizer = load_model_and_tokenizer(
         model_args = model_args, 
-        lm_model_lora_config = lora_config,
-        param_dir = custom_args.param_dir if hasattr(custom_args, 'param_dir') else None,
-        model_name = model_name
+        param_dir = custom_args.param_dir,
+        lora_config=lora_config,
     )
     preprocessor = SamplePreprocessorForFinetune(tokenizer=tokenizer, beacon_size=custom_args.beacon_size, max_length=data_args.max_length)
     data_collator = CHADataCollator()
