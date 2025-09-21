@@ -10,6 +10,7 @@ from tqdm import tqdm
 from transformers.utils import send_example_telemetry
 from transformers.trainer_utils import get_last_checkpoint
 from transformers import set_seed
+from peft import LoraConfig, PeftModel, get_peft_model
 import datasets
 from datasets import DatasetDict, Dataset, load_dataset, load_from_disk
 from dataprocessor import SamplePreprocessorForFinetune, CHADataCollator
@@ -27,7 +28,10 @@ if __name__ == "__main__":
         training_args.gradient_checkpointing_kwargs = {"use_reentrant": False}
 
     if "llama" in model_args.model_name_or_path.lower():
-        model_name = "llama"
+        if "3.1" in model_args.model_name_or_path.lower():
+            model_name = "llama3.1"
+        else:
+            model_name = "llama3"
     elif "qwen" in model_args.model_name_or_path.lower():
         model_name = "qwen"
     elif "mistral" in model_args.model_name_or_path.lower():
@@ -38,7 +42,7 @@ if __name__ == "__main__":
         raise ValueError("Unsupported model name. Please use a model from Llama, Qwen, or Mistral.")
     local_rank = str(os.environ.get("LOCAL_RANK", 0))
     if training_args.overwrite_output_dir or not os.path.exists(training_args.output_dir):
-        training_args.output_dir = training_args.output_dir + f"-{model_name}" + "-gradient" + str(training_args.gradient_accumulation_steps) + "-epochs" + str(training_args.num_train_epochs) + "-time" + datetime.datetime.now().strftime("%Y%m%d%H%M%S") + "-localrank" + local_rank
+        training_args.output_dir = training_args.output_dir + "-lorar" + f"-{custom_args.lora_r}" + f"-{model_name}" + "-gradient" + str(training_args.gradient_accumulation_steps) + "-epochs" + str(training_args.num_train_epochs) + "-time" + datetime.datetime.now().strftime("%Y%m%d%H%M%S") + "-localrank" + local_rank
     training_args.run_name = training_args.output_dir.split('/')[-1]
 
     # import wandb
@@ -47,11 +51,11 @@ if __name__ == "__main__":
     # import swanlab
     # swanlab.init(project='CHA_finetune', name=training_args.run_name, config=vars(training_args))
     from swanlab.integration.transformers import SwanLabCallback
-    swanlab_callback = SwanLabCallback(project="CHA_finetune", experiment_name=training_args.run_name, config=vars(training_args))
+    swanlab_callback = SwanLabCallback(project="CHA_LoRA_finetune", experiment_name=training_args.run_name, config=vars(training_args))
     training_args.report_to = []
 
     # Logging stuff
-    send_example_telemetry("run_CHA_finetune", model_args, data_args)
+    send_example_telemetry("run_CHA_LoRA_finetune", model_args, data_args)
 
     # Setup logging
     logging.basicConfig(
@@ -106,8 +110,18 @@ if __name__ == "__main__":
     set_seed(training_args.seed)
 
     # tokenizer = AutoTokenizer.from_finetuneed(args.model_name_or_path)
+    lora_config = LoraConfig(
+        r=custom_args.lora_r,
+        lora_alpha=2 * custom_args.lora_r,
+        lora_dropout=custom_args.lora_dropout,
+        bias="none",
+        task_type=None,
+        target_modules=['q_proj', 'v_proj', 'k_proj']
+    )
     model, tokenizer = load_model_and_tokenizer(
         model_args = model_args, 
+        lm_model_lora_config = lora_config,
+        param_dir = custom_args.param_dir if hasattr(custom_args, 'param_dir') else None,
         model_name = model_name
     )
     preprocessor = SamplePreprocessorForFinetune(tokenizer=tokenizer, beacon_size=custom_args.beacon_size, max_length=data_args.max_length)

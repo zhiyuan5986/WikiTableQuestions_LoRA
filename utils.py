@@ -7,7 +7,7 @@ from transformers import (
     AutoModel,
 )
 from sentence_transformers import SentenceTransformer
-from peft import LoraConfig, PeftModel
+from peft import LoraConfig, get_peft_model, PeftModel
 # from src.llama.modeling_llama import LlamaForCausalLMWithBeacon
 # from src.qwen2.modeling_qwen2 import Qwen2ForCausalLMWithBeacon
 # from src.mistral.modeling_mistral import MistralForCausalLMWithBeacon
@@ -41,7 +41,7 @@ def load_model_and_tokenizer(
     else:
         model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, torch_dtype=model_args.torch_dtype, low_cpu_mem_usage=model_args.low_cpu_mem_usage, attn_implementation=model_args.attn_implementation, device_map=lm_model_device_map)
     try:
-        model.lm_model = PeftModel.from_pretrained(model, param_dir, torch_dtype=model_args.torch_dtype)
+        model = PeftModel.from_pretrained(model, param_dir, torch_dtype=model_args.torch_dtype, is_trainable=True)
     except:
         pass
     # for name, param in model.named_parameters():

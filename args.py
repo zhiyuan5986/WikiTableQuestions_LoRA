@@ -271,9 +271,9 @@ class CustomArguments:
     stop_after_n_steps: int = field(
         default=10000, metadata={"help": "Stop training after n steps"}
     )
-    # param_dir: str = field(
-    #     default=None, metadata={"help": "The directory to load the parameters from"}
-    # )
+    param_dir: str = field(
+        default=None, metadata={"help": "The directory to load the parameters from"}
+    )
     beacon_size: int = field(
         default=1, metadata={"help": "Beacon size"}
     )
@@ -281,6 +281,7 @@ class CustomArguments:
         default=0.05, metadata={"help": "The dropout rate for lora"}
     )
     lora_r: int = field(default=16, metadata={"help": "The r value for lora"})
+
     # sentence_encoder_lora_dropout: float = field(
     #     default=0.05, metadata={"help": "The dropout rate for lora"}
     # )
