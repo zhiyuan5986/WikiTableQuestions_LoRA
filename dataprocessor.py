@@ -66,8 +66,8 @@ class SamplePreprocessorForPretrain:
             self.postfix_ids = []
             return
         
-        prefix_ids = self.tokenizer.encode(prefix_text)
-        postfix_ids = self.tokenizer.encode(postfix_text)
+        prefix_ids = self.tokenizer.encode(prefix_text, add_special_tokens=False)
+        postfix_ids = self.tokenizer.encode(postfix_text, add_special_tokens=False)
         
         print("********** SamplePreprocessor post init **********")
         print("prefix text: ", prefix_text)
@@ -232,8 +232,8 @@ class SamplePreprocessorForFinetune:
             self.postfix_ids = []
             return
         
-        prefix_ids = self.tokenizer.encode(prefix_text)
-        postfix_ids = self.tokenizer.encode(postfix_text)
+        prefix_ids = self.tokenizer.encode(prefix_text, add_special_tokens=False)
+        postfix_ids = self.tokenizer.encode(postfix_text, add_special_tokens=False)
         
         print("********** SamplePreprocessor post init **********")
         print("prefix text: ", prefix_text)
@@ -366,8 +366,8 @@ class SamplePreprocessor:
             self.postfix_ids = []
             return
         
-        prefix_ids = self.tokenizer.encode(prefix_text)
-        postfix_ids = self.tokenizer.encode(postfix_text)
+        prefix_ids = self.tokenizer.encode(prefix_text, add_special_tokens=False)
+        postfix_ids = self.tokenizer.encode(postfix_text, add_special_tokens=False)
         
         print("********** SamplePreprocessor post init **********")
         print("prefix text: ", prefix_text)
